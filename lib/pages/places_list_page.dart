@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
+import './add_place_page.dart';
+
 class PlacesListPage extends StatelessWidget {
+
+  void onAddPlaceClick(BuildContext context) {
+    Navigator.of(context).pushNamed(AddPlacePage.routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,7 +15,7 @@ class PlacesListPage extends StatelessWidget {
         title: const Text("Your Places"),
         actions: [
           IconButton(
-            onPressed: () {}, 
+            onPressed: () => onAddPlaceClick(context), 
             icon: const Icon(Icons.add)
           )
         ],
