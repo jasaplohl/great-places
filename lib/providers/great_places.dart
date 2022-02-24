@@ -4,9 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/place.dart';
+import '../helpers/db_helper.dart';
 
 class GreatPlaces with ChangeNotifier {
-  final List<Place> _items = [];
+
+  static const String placesTableName = "user_places";
+  List<Place> _items = [];
 
   List<Place> get items {
     return [..._items];
@@ -14,6 +17,19 @@ class GreatPlaces with ChangeNotifier {
 
   int get itemCount {
     return _items.length;
+  }
+
+  Future<void> fetchAndSetPlaces() async {
+    final data = await DBHelper.getData(placesTableName);
+    _items = data.map((item) {
+      return Place(
+        id: item["id"], 
+        title: item["title"], 
+        location: PlaceLocation(latitude: 0, longitude: 0), 
+        image: File(item["image"])
+      );
+    }).toList();
+    notifyListeners();
   }
 
   void addPlace(String title, File image) {
@@ -28,5 +44,10 @@ class GreatPlaces with ChangeNotifier {
     );
     _items.add(newPlace);
     notifyListeners();
+    DBHelper.insert(placesTableName, {
+      "id": newPlace.id,
+      "title": newPlace.title,
+      "image": newPlace.image.path
+    });
   }
 }

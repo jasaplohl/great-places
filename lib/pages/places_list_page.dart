@@ -25,23 +25,33 @@ class PlacesListPage extends StatelessWidget {
           )
         ],
       ),
-      body: Consumer<GreatPlaces>(
-        builder: (context, greatPlaces, child) {
-          print("ITEMS: ${greatPlaces.itemCount}");
-          if(greatPlaces.itemCount > 0) {
-            return ListView.builder(
-              itemCount: greatPlaces.itemCount,
-              itemBuilder: (context, index) {
-                return PlaceListItem(greatPlaces.items[index]);
-              }
+      body: FutureBuilder(
+        future: Provider.of<GreatPlaces>(context, listen: false).fetchAndSetPlaces(),
+        builder: (ctx, snapshot) {
+          if(snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator()
             );
           } else {
-            return child!;
+            return Consumer<GreatPlaces>(
+              builder: (context, greatPlaces, child) {
+                if(greatPlaces.itemCount > 0) {
+                  return ListView.builder(
+                    itemCount: greatPlaces.itemCount,
+                    itemBuilder: (context, index) {
+                      return PlaceListItem(greatPlaces.items[index]);
+                    }
+                  );
+                } else {
+                  return child!;
+                }
+              },
+              child: const Center(
+                child: Text("No places yet, start adding some!"),
+              ),
+            );
           }
-        },
-        child: const Center(
-          child: Text("No places yet, start adding some!"),
-        ),
+        }
       )
     );
   }
