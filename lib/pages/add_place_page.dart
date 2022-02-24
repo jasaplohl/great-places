@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/image_input.dart';
+
+import '../providers/great_places.dart';
 
 class AddPlacePage extends StatefulWidget {
   static const String routeName = "/add-place";
@@ -12,9 +17,18 @@ class AddPlacePage extends StatefulWidget {
 class _AddPlacePageState extends State<AddPlacePage> {
 
   final TextEditingController _titleController = TextEditingController();
+  File? _pickedImage;
 
-  void submitPlace() {
+  void _submitPlace(BuildContext context) {
+    final String title = _titleController.text;
+    if(title.isNotEmpty && _pickedImage != null) {
+      Provider.of<GreatPlaces>(context, listen: false).addPlace(title, _pickedImage!);
+      Navigator.of(context).pop();
+    }
+  }
 
+  void _imagePicked(File pickedImage) {
+    _pickedImage = pickedImage;
   }
 
   @override
@@ -37,14 +51,14 @@ class _AddPlacePageState extends State<AddPlacePage> {
                       controller: _titleController
                     ),
                     const SizedBox(height: 15),
-                    ImageInput()
+                    ImageInput(_imagePicked)
                   ],
                 )
               )
             )
           ),
           ElevatedButton.icon(
-            onPressed: submitPlace, 
+            onPressed: () => _submitPlace(context), 
             icon: const Icon(Icons.add), 
             label: const Text("Add Place"),
             style: ButtonStyle(
